@@ -130,7 +130,7 @@ Do not erase the whole chip if the factory app in `ota_0` must remain. To replac
 esptool.py --chip esp32c3 -p COMx -b 460800 write_flash 0x1A0000 release/FGMDCharge_FD_ROUND_V2.bin
 ```
 
-`BUILD_RELEASE.bat` builds. `GO.bat` builds and writes bootloader, partition table, factory image and this app. It asks for the COM port.
+The table above is the cube, not a blank S3. `BUILD_RELEASE.bat` and `GO.bat` in this repository refuse to run. Flash the cube from [the cube repository](https://github.com/pomsfgend/FGMDCharge-FD-ROUND-V2). A blank S3 uses `GO_S3.bat`, which writes the bootloader at `0x0`.
 
 ## ESP32-S3
 
@@ -295,7 +295,7 @@ SPI 40 МГц. CAN 250 кбит/с, расширенные кадры, филь�
 esptool.py --chip esp32c3 -p COMx -b 460800 write_flash 0x1A0000 release/FGMDCharge_FD_ROUND_V2.bin
 ```
 
-`BUILD_RELEASE.bat` собирает. `GO.bat` собирает и пишет загрузчик, таблицу, заводской образ и это приложение. Порт скрипт спрашивает сам.
+Таблица выше — это куб, не пустая S3. `BUILD_RELEASE.bat` и `GO.bat` в этом репозитории сразу выходят. Куб прошивается из [репозитория куба](https://github.com/pomsfgend/FGMDCharge-FD-ROUND-V2). Пустую S3 шьёт `GO_S3.bat`, загрузчик с `0x0`.
 
 ### ESP32-S3
 
