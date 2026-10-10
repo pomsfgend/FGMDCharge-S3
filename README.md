@@ -1,12 +1,18 @@
+# FGMDCharge-S3
+
+ESP32-S3 port of [FGMDCharge / FD_ROUND V2](https://github.com/pomsfgend/FGMDCharge-FD-ROUND-V2) release 2.8.17. Version here is **3.0.0**, name `FD_ROUND_S3`. The cube repository stays the C3 line. Do not flash this tree into the cube.
+
+An earlier sketch is branch [hw/esp32-s3](https://github.com/pomsfgend/FGMDCharge-FD-ROUND-V2/tree/hw/esp32-s3), cut from 2.8.15. New work is this repository. Hardware, pins and prices: [docs/s3/PORT_RU.md](docs/s3/PORT_RU.md). Who did not design the board: [AUTHORS.md](AUTHORS.md).
+
 # FGMDCharge / FD_ROUND V2
 
 [English](README.md) · [Русский](#русский) · [中文](docs/i18n/README.zh-CN.md) · [Español](docs/i18n/README.es.md) · [Português](docs/i18n/README.pt-BR.md) · [Deutsch](docs/i18n/README.de.md) · [Français](docs/i18n/README.fr.md) · [日本語](docs/i18n/README.ja.md) · [한국어](docs/i18n/README.ko.md)
 
 Issues and pull requests are welcome in any of those languages.
 
-Public firmware for the round ESP32-C3 cube that answers a DC charging station on CAN as the vehicle BMS.
+Below is still the description of what the firmware does on CAN. The binary you build here is the S3 one.
 
-Release **2.8.17**. Journal: [CHANGELOG.md](CHANGELOG.md). What changed in each old archive: [docs/ARCHIVE_CHANGES.md](docs/ARCHIVE_CHANGES.md). Old source, not this tree: branch [`history`](https://github.com/pomsfgend/FGMDCharge-FD-ROUND-V2/tree/history) and `src/X.Y.Z`. Packages: [archive/](archive/). Branch rules: [docs/BRANCHES.md](docs/BRANCHES.md).
+Release **3.0.0** (base cube **2.8.17**). Journal: [CHANGELOG.md](CHANGELOG.md). What changed in each old archive: [docs/ARCHIVE_CHANGES.md](docs/ARCHIVE_CHANGES.md). Old source, not this tree: branch [`history`](https://github.com/pomsfgend/FGMDCharge-FD-ROUND-V2/tree/history) and `src/X.Y.Z`. Packages: [archive/](archive/). Branch rules: [docs/BRANCHES.md](docs/BRANCHES.md).
 
 This tree was vibe-coded over a long time from the factory dump in `original/` and from trying the cube on real stations. There is no single author. The factory image itself was not written in this repository. The board was not designed here.
 
@@ -126,36 +132,38 @@ esptool.py --chip esp32c3 -p COMx -b 460800 write_flash 0x1A0000 release/FGMDCha
 
 `BUILD_RELEASE.bat` builds. `GO.bat` builds and writes bootloader, partition table, factory image and this app. It asks for the COM port.
 
-## ESP32-S3 later
+## ESP32-S3
 
-This tree **does not build for ESP32-S3**. `sdkconfig` is `esp32c3`. Nothing here was run on an S3.
+This repository **is** the S3 line. It was split from the cube at release 2.8.17. `sdkconfig.defaults` targets `esp32s3`. `GO.bat` and `BUILD_RELEASE.bat` exit immediately so they cannot write a cube command at a DevKit.
 
-When the cube board is replaced by a plain ESP32-S3 module, keep the same parts (ST7789, CST816S, CAN transceiver, two relay drivers) and change the chip target:
+Default board: ESP32-S3-DevKitC-1 N16R8 (N8R2 uses the same free pins). SPI ST7789 240×280, CST816, TWAI 250 kbit/s, two active-high relay outputs. Buy list, LilyGO, round and RGB panels: [docs/s3/PORT_RU.md](docs/s3/PORT_RU.md).
 
-```
-idf.py set-target esp32s3
-```
+There is **no prebuilt S3 binary**. ESP-IDF must be `>=5.0.9,<5.1.0`. `GO_S3.bat` builds and flashes a blank board:
 
-Then set flash size to the module you bought (4 MB is enough) and point the console at USB Serial/JTAG if you do not fit a second USB-UART.
+| Piece | Address |
+|---|---|
+| bootloader | `0x0` |
+| partition table | `0x8000` |
+| app `ota_0` | `0x10000` |
 
-**GPIO19 on ESP32-S3 is USB D−.** This cube uses GPIO19 as LCD SCLK, so that one wire must move. GPIO20 is USB D+ and is UART RX on the C3, so do not reuse it as a button or a display pin if you want USB. Suggested S3 wiring if you redraw the board (not tested):
+That is not the cube map. The file `release/FGMDCharge_FD_ROUND_V2.bin` is still the cube image from 2.8.17. Do not write it to an S3. On the cube it belongs at `0x1A0000`, with otadata selecting slot 1, and the factory app in `ota_0` stays. The factory blob named `bootloader_0x1000_0x8000.bin` is a dump read from `0x1000`. IDF 5.0.9 on a blank C3 or S3 uses bootloader offset `0x0`.
 
-| Function | C3 now | S3 suggestion |
-|---|---|---|
-| LCD MOSI | 5 | 11 |
-| LCD SCLK | 19 | 12 |
-| LCD CS | 4 | 10 |
-| LCD DC | 18 | 13 |
-| Backlight | 2 | 14 |
-| Touch SDA | 1 | 8 |
-| Touch SCL | 8 | 9 |
-| CAN TX | 10 | 17 |
-| CAN RX | 9 | 18 |
-| Relay A | 6 | 15 |
-| Relay B | 7 | 16 |
-| Console | UART0 GPIO21/20 | native USB GPIO19/20, leave them free |
+Pins in `main/boards/esp32s3_devkit.h` (`#ifndef`, so `-D` can override):
 
-Avoid S3 strap pins GPIO0, GPIO3, GPIO45 and GPIO46. Edit only `main/config.h` for the new numbers, then build. CAN, the GB/T state machine and the website do not care which GPIO is which, as long as `config.h` matches the wires.
+| Function | GPIO |
+|---|---|
+| LCD MOSI / SCLK / CS / DC | 11 / 12 / 10 / 13 |
+| LCD RST / backlight PWM | 14 / 21 |
+| Touch SDA / SCL | 1 / 2 |
+| CAN TX / RX | 17 / 18 |
+| Relay A / B, active high | 6 / 7 |
+| Status LED | 47 |
+
+CST816 INT and RST may be wired to GPIO4 and GPIO5. `touch_cst816s.c` does not drive them. XPT2046, if used later, has CS 16 and IRQ 8. Do not use the old untested sketch (backlight 14, touch 8/9, relays 15/16).
+
+Leave free: straps 0, 3, 45, 46; USB 19/20; unbonded 22–25; flash 26–32; octal PSRAM 33–37 on N16R8; UART0 43/44 on a CH340 clone; onboard RGB 38 or 48. PSRAM stays off in 3.0.0. `display.c` still inits only ST7789 and ILI9341. GC9A01, QSPI and RGB are documented, not compiled in. The power stage is an external certified GB/T module. This firmware drives 3.3 V, 5 V and a 12 V coil only.
+
+To rebuild the cube pinout from this tree: `-DCUBE_BOARD=CUBE_BOARD_C3_ORIGINAL`, `idf.py set-target esp32c3`, and `sdkconfig.defaults.c3`. Prefer the cube repository for that. Do not full-chip-erase the cube.
 
 ## Layout
 
@@ -167,9 +175,9 @@ Avoid S3 strap pins GPIO0, GPIO3, GPIO45 and GPIO46. Edit only `main/config.h` f
 
 ## Русский
 
-Публичная прошивка круглого куба на ESP32-C3. На CAN станции постоянного тока куб отвечает как BMS автомобиля, а не как зарядная станция.
+Ниже по-прежнему описано, что прошивка отвечает станции по CAN. Собирать здесь нужно уже S3, не куб.
 
-Release **2.8.17**. Журнал: [CHANGELOG.md](CHANGELOG.md). Что менялось в каждом старом архиве: [docs/ARCHIVE_CHANGES.md](docs/ARCHIVE_CHANGES.md). Старый исходник, не это дерево: ветка [`history`](https://github.com/pomsfgend/FGMDCharge-FD-ROUND-V2/tree/history) и `src/X.Y.Z`. Пакеты: [archive/](archive/). Ветки: [docs/BRANCHES.md](docs/BRANCHES.md).
+Release **3.0.0** (база куба **2.8.17**). Журнал: [CHANGELOG.md](CHANGELOG.md). Что менялось в каждом старом архиве: [docs/ARCHIVE_CHANGES.md](docs/ARCHIVE_CHANGES.md). Старый исходник, не это дерево: ветка [`history`](https://github.com/pomsfgend/FGMDCharge-FD-ROUND-V2/tree/history) и `src/X.Y.Z`. Пакеты: [archive/](archive/). Ветки: [docs/BRANCHES.md](docs/BRANCHES.md).
 
 Это дерево собрано вайбкодингом, долго, от заводского дампа в `original/` и от поездок к живым станциям. Одного автора нет. Заводской образ написан не здесь. Плату здесь не разрабатывали.
 
@@ -289,36 +297,21 @@ esptool.py --chip esp32c3 -p COMx -b 460800 write_flash 0x1A0000 release/FGMDCha
 
 `BUILD_RELEASE.bat` собирает. `GO.bat` собирает и пишет загрузчик, таблицу, заводской образ и это приложение. Порт скрипт спрашивает сам.
 
-### Позже на ESP32-S3
+### ESP32-S3
 
-Это дерево **под ESP32-S3 не собирается**. `sdkconfig` — `esp32c3`. На S3 ничего отсюда не запускалось.
+Это репозиторий **и есть** линия S3. Он отделён от куба на релизе 2.8.17. `sdkconfig.defaults` целится в `esp32s3`. `GO.bat` и `BUILD_RELEASE.bat` сразу выходят, чтобы команда куба не уехала в DevKit.
 
-Когда вместо платы куба будет обычный модуль ESP32-S3, детали те же (ST7789, CST816S, трансивер CAN, два драйвера реле). Меняется чип:
+Плата по умолчанию: ESP32-S3-DevKitC-1 N16R8 (у N8R2 те же свободные ноги). SPI ST7789 240×280, CST816, TWAI 250 кбит/с, два выхода реле, активный высокий. Что купить, LilyGO, круглые и RGB панели: [docs/s3/PORT_RU.md](docs/s3/PORT_RU.md).
 
-```
-idf.py set-target esp32s3
-```
+**Готового bin для S3 нет.** Нужен ESP-IDF `>=5.0.9,<5.1.0`. `GO_S3.bat` собирает и шьёт пустую плату: загрузчик `0x0`, таблица `0x8000`, приложение `ota_0` с `0x10000`. Это не карта куба.
 
-Дальше размер flash под купленный модуль (4 МБ хватает) и консоль на USB Serial/JTAG, если отдельный USB-UART не ставите.
+Файл `release/FGMDCharge_FD_ROUND_V2.bin` — образ куба 2.8.17. На S3 его не писать. На кубе он живёт в `0x1A0000`, otadata выбирает слот 1, завод в `ota_0` остаётся. Файл `bootloader_0x1000_0x8000.bin` назван по адресу, с которого его читали. У пустой платы на IDF 5.0.9 загрузчик пишется с `0x0`.
 
-**GPIO19 на ESP32-S3 — это USB D−.** На кубе GPIO19 — это такт экрана, этот провод придётся перенести. GPIO20 — USB D+, на C3 это ещё и RX консоли. Не занимайте его кнопкой или экраном, если нужен USB. Разводка S3, если плата рисуется заново (не проверялась):
+Ноги в `main/boards/esp32s3_devkit.h`: MOSI 11, SCLK 12, CS 10, DC 13, RST 14, подсветка 21, тач SDA 1 / SCL 2, CAN 17 / 18, реле A 6 / B 7, светодиод 47. INT и RST тача можно посадить на 4 и 5, прошивка ими не рулит. Старую непроверенную схему (подсветка 14, тач 8/9, реле 15/16) не использовать.
 
-| Функция | Сейчас C3 | Вариант S3 |
-|---|---|---|
-| LCD MOSI | 5 | 11 |
-| LCD SCLK | 19 | 12 |
-| LCD CS | 4 | 10 |
-| LCD DC | 18 | 13 |
-| Подсветка | 2 | 14 |
-| Тач SDA | 1 | 8 |
-| Тач SCL | 8 | 9 |
-| CAN TX | 10 | 17 |
-| CAN RX | 9 | 18 |
-| Реле A | 6 | 15 |
-| Реле B | 7 | 16 |
-| Консоль | UART0 GPIO21/20 | родной USB GPIO19/20, не занимать |
+Не занимать: strap 0, 3, 45, 46; USB 19/20; несуществующие 22–25; flash 26–32; octal PSRAM 33–37 у N16R8; UART0 43/44 у клона на CH340; RGB платы 38 или 48. PSRAM в 3.0.0 выключен. `display.c` по-прежнему поднимает только ST7789 и ILI9341. Силовая часть — внешний сертифицированный модуль GB/T. Прошивка трогает только 3,3 В, 5 В и катушку 12 В.
 
-Не трогайте strap-пины S3: GPIO0, GPIO3, GPIO45, GPIO46. Новые номера пишутся только в `main/config.h`, затем сборка. CAN, автомат GB/T и сайт не зависят от номеров, если `config.h` совпадает с проводами.
+Собрать старые ноги куба из этого дерева можно: `-DCUBE_BOARD=CUBE_BOARD_C3_ORIGINAL`, `idf.py set-target esp32c3`, файл `sdkconfig.defaults.c3`. Для куба проще родительский репозиторий. Весь чип куба не стирать.
 
 ### Состав дерева
 

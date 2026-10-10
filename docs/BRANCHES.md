@@ -1,3 +1,11 @@
+# This repository
+
+`main` here is FGMDCharge-S3 **3.0.0**. The cube is not developed in this repository.
+
+Cube firmware and its prebuilt image: <https://github.com/pomsfgend/FGMDCharge-FD-ROUND-V2>
+
+Branch `hw/esp32-s3` on the cube repository is an older sketch from 2.8.15. Do not open new S3 work against it.
+
 # Branches
 
 `main` is the current firmware, 2.8.17. Releases and the prebuilt image come from here.

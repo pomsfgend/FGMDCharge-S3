@@ -1,6 +1,18 @@
 # Changelog
 
-Current source and the only prebuilt image are **2.8.17**.
+## 3.0.0
+
+This repository starts at this version. It is the ESP32-S3 port of cube release 2.8.17.
+
+- Default board is ESP32-S3-DevKitC-1. Pins live in `main/boards/esp32s3_devkit.h`.
+- `sdkconfig.defaults` targets esp32s3, 16 MB QIO, USB-Serial-JTAG, PSRAM off. Cube defaults are `sdkconfig.defaults.c3`.
+- `GO.bat` and `BUILD_RELEASE.bat` refuse to run. A blank board uses `GO_S3.bat`.
+- There is no prebuilt S3 image. `release/FGMDCharge_FD_ROUND_V2.bin` is the cube 2.8.17 file and must not be written to an S3.
+- IDF stays `>=5.0.9,<5.1.0`. `display.c` still inits only ST7789 and ILI9341.
+
+The 2.8.x notes below are the cube journal this tree was copied from. The only prebuilt image still in this tree is that C3 file.
+
+Current cube source, which this port follows, is **2.8.17**.
 
 Older numbers below are the journal of what changed. Their trees were not kept. A tag `notes/x.y.z` points at this same documentation commit so the text has a permanent URL. The zip GitHub attaches to that tag is **not** the old firmware. Do not flash it as that version.
 
