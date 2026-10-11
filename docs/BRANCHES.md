@@ -1,3 +1,11 @@
+# Где смотреть
+
+Конструктор: <https://apple-raven-kite-lunar.grok.me>
+
+Группа Telegram: <https://t.me/+Z7iS1mfgtphiMDhi>
+
+Эта ветка `main` — линия S3 3.0.0. Куб в теме ESP32-C3, эта плата в теме ESP32-S3.
+
 # This repository
 
 `main` here is FGMDCharge-S3 **3.0.0**. The cube is not developed in this repository.

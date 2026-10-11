@@ -4,6 +4,22 @@ ESP32-S3 port of [FGMDCharge / FD_ROUND V2](https://github.com/pomsfgend/FGMDCha
 
 An earlier sketch is branch [hw/esp32-s3](https://github.com/pomsfgend/FGMDCharge-FD-ROUND-V2/tree/hw/esp32-s3), cut from 2.8.15. New work is this repository. Hardware, pins and prices: [docs/s3/PORT_RU.md](docs/s3/PORT_RU.md). Who did not design the board: [AUTHORS.md](AUTHORS.md).
 
+
+## Сайт и группа
+
+Конструктор: виртуальный сеанс, провода, корзина, шаги и кнопка прошивки.
+
+<https://apple-raven-kite-lunar.grok.me>
+
+Группа веток в Telegram. Темы: Основное, Карта, ESP32-C3, ESP32-S3, Не шить.
+
+<https://t.me/+Z7iS1mfgtphiMDhi>
+
+Сайт рисует сеанс. Настоящий протокол по-прежнему выбирает CAN в прошивке, не ползунок на странице. Кнопка «Прошить куб» пишет только релиз куба 2.8.17 в `0x1A0000` и выбор слота в `0xD000`, сверяет SHA256 и отказывается от любого чипа кроме ESP32-C3. Весь чип не стирает. Порт нужен в Chrome или Edge. Кнопка S3 готовый bin не отдаёт: его нет, она ждёт три файла после `idf.py build` и отказывается от чипа не S3. Новость о ветке пишется в тему своего чипа. Группа README не заменяет.
+
+The configurator is the first link. The Telegram invite is the second. Branch news goes in that chip's topic. Neither link is a place to download an S3 binary.
+
+
 # FGMDCharge / FD_ROUND V2
 
 [English](README.md) · [Русский](#русский) · [中文](docs/i18n/README.zh-CN.md) · [Español](docs/i18n/README.es.md) · [Português](docs/i18n/README.pt-BR.md) · [Deutsch](docs/i18n/README.de.md) · [Français](docs/i18n/README.fr.md) · [日本語](docs/i18n/README.ja.md) · [한국어](docs/i18n/README.ko.md)
@@ -298,6 +314,8 @@ esptool.py --chip esp32c3 -p COMx -b 460800 write_flash 0x1A0000 release/FGMDCha
 Таблица выше — это куб, не пустая S3. `BUILD_RELEASE.bat` и `GO.bat` в этом репозитории сразу выходят. Куб прошивается из [репозитория куба](https://github.com/pomsfgend/FGMDCharge-FD-ROUND-V2). Пустую S3 шьёт `GO_S3.bat`, загрузчик с `0x0`.
 
 ### ESP32-S3
+
+Сайт конструктора: <https://apple-raven-kite-lunar.grok.me>. Группа: <https://t.me/+Z7iS1mfgtphiMDhi>. Темы и правила — в блоке «Сайт и группа» в начале файла.
 
 Это репозиторий **и есть** линия S3. Он отделён от куба на релизе 2.8.17. `sdkconfig.defaults` целится в `esp32s3`. `GO.bat` и `BUILD_RELEASE.bat` сразу выходят, чтобы команда куба не уехала в DevKit.
 
